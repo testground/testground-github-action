@@ -68,6 +68,7 @@ fi
 
 outcome=$(echo "${extstatus}" | jq ".outcome")
 
+echo "the extended status was ${extstatus}"
 echo "The outcome of this test was ${outcome}"
 echo "${OUTPUT_OUTCOME}${outcome}"
 
