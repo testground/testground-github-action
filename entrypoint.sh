@@ -8,6 +8,7 @@ SUCCESS=0
 FAILURE=1
 
 # For github to collect the action output, use these strings:
+# Note that if you echo these strings, they will not be visible in the action log.
 OUTPUT_STATUS="::set-output name=status::"
 OUTPUT_OUTCOME="::set-output name=outcome::"
 
@@ -24,18 +25,16 @@ REAL_COMP_FILE=$(realpath $INPUT_COMPOSITION_FILE)
 mkdir -p "${PLANSHOME}"
 ln -s "${REAL_PLAN_DIR}" "${PLANSHOME}"
 
-echo real quick ls
-ls -l "${PLANSHOME}"
-
 # Run test and wait until finished.
 # There is a --wait option, so it might work to use it like this
 # testground --endpoint "$BACKEND" run composition -f "$REAL_COMP_FILE" --wait
 # However, --wait doesn't always work well particularly for long-running jobs
 # so instead, do a long poll.
-/testground --endpoint "${BACKEND}" run composition -f "${REAL_COMP_FILE}" | tee testground.out
-TGID=$(awk '/run is queued with ID/ {print $10}' <testground.out)
+/testground --endpoint "${BACKEND}" run composition -f "${REAL_COMP_FILE}" | tee run.out
+TGID=$(awk '/run is queued with ID/ {print $10}' <run.out)
 
 echo "Got testground ID ${TGID}"
+echo -n "Testground started: "; date
 echo "Waiting for job to complete."
 
 while [ "${status}" != "complete" ]
@@ -46,13 +45,16 @@ do
 	echo "${OUTPUT_STATUS}${status}"
 done
 
+echo -n "Testground ended: "; date
+
 echo getting extended status
 /testground --endpoint "${BACKEND}" status -t "${TGID}" --extended  | tee extendedstatus.out
 # Get the extened status, which includes a "Result" section.
-# Capture the line that occurs after "Result"
+# Capture the line that occurs after "Result:"
 extstatus=$(awk '/Result/ {getline; print $0}' <extendedstatus.out)
 
 # First off, there are control characters in this output, and we need to remove that.
+# https://github.com/testground/testground/issues/1214
 extstatus=$(echo "${extstatus}" | tr -d "[:cntrl:]" |  sed 's/\[0m//g')
 
 # test if we got a result at all. The result might be "null". A null result means most likely the
