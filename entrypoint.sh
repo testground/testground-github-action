@@ -66,7 +66,7 @@ fi
 # Now find the outcome of the test. The extended result is going to look something like this:
 # {"journal":{"events":{},"pods_statuses":{}},"outcome":"success","outcomes":{"providers":{"ok":1,"total":1},"requestors":{"ok":1,"total":1}}}
 
-outcome=$(echo "${extstatus} | jq ".outcome")
+outcome=$(echo "${extstatus}" | jq ".outcome")
 
 echo "The outcome of this test was ${outcome}"
 echo "${OUTPUT_OUTCOME}${outcome}"
