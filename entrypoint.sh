@@ -53,7 +53,7 @@ echo getting extended status
 extstatus=$(awk '/Result/ {getline; print $0}' <extendedstatus.out)
 
 # First off, there are control characters in this output, and we need to remove that.
-extstatus=$(echo "${extstatus}" | tr -d "[:cntrl:]" |  sed 's/\[0m //g')
+extstatus=$(echo "${extstatus}" | tr -d "[:cntrl:]" |  sed 's/\[0m//g')
 
 # test if we got a result at all. The result might be "null". A null result means most likely the
 # job was canceled before it began for some reason.
