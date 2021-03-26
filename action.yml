@@ -21,6 +21,8 @@ outputs:
     description: 'status of the testground run, i.e. completed/cancled'
   outcome:
     description: 'high-level result of the test'
+  testground_id:
+    description: 'testground identifier'
 runs:
   using: 'docker'
   image: './Dockerfile'

@@ -11,6 +11,7 @@ FAILURE=1
 # Note that if you echo these strings, they will not be visible in the action log.
 OUTPUT_STATUS="::set-output name=status::"
 OUTPUT_OUTCOME="::set-output name=outcome::"
+OUTPUT_ID="::set-output name=testground_id"
 
 BACKEND="${INPUT_BACKEND_PROTO}"'://'"${INPUT_BACKEND_ADDR}"
 
@@ -32,6 +33,7 @@ ln -s "${REAL_PLAN_DIR}" "${PLANSHOME}"
 # so instead, do a long poll.
 /testground --endpoint "${BACKEND}" run composition -f "${REAL_COMP_FILE}" | tee run.out
 TGID=$(awk '/run is queued with ID/ {print $10}' <run.out)
+echo "${OUTPUT_ID}${TGID}"
 
 echo "Got testground ID ${TGID}"
 echo -n "Testground started: "; date
