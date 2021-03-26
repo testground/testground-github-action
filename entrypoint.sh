@@ -39,7 +39,7 @@ echo "Got testground ID ${TGID}"
 echo -n "Testground started: "; date
 echo "Waiting for job to complete."
 
-while [ "${status}" != "complete" ]
+while [ "${status}" != "complete" || ${status} != "canceled"]
 do
 	sleep 30
 	status=$(/testground --endpoint "${BACKEND}" status -t "${TGID}" | awk '/Status/ {print $2}')
