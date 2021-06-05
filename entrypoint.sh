@@ -32,10 +32,10 @@ ln -s "${REAL_PLAN_DIR}" "${PLANSHOME}"
 # However, --wait doesn't always work well particularly for long-running jobs
 # so instead, do a long poll.
 /testground --endpoint "${BACKEND}" run composition \
-	-f "${REAL_COMP_FILE}"                            \
-	--metadata-repo "${GITHUB_REPOSITORY}"            \
-	--metadata-branch "${GITHUB_REF#refs/heads/}"     \
-	--metadata-commit "${GITHUB_SHA}" | tee run.out   \
+  -f "${REAL_COMP_FILE}"                            \
+  --metadata-repo "${GITHUB_REPOSITORY}"            \
+  --metadata-branch "${GITHUB_REF#refs/heads/}"     \
+  --metadata-commit "${GITHUB_SHA}" | tee run.out
 TGID=$(awk '/run is queued with ID/ {print $10}' <run.out)
 echo "${OUTPUT_ID}${TGID}"
 
