@@ -31,7 +31,11 @@ ln -s "${REAL_PLAN_DIR}" "${PLANSHOME}"
 # testground --endpoint "$BACKEND" run composition -f "$REAL_COMP_FILE" --wait
 # However, --wait doesn't always work well particularly for long-running jobs
 # so instead, do a long poll.
-/testground --endpoint "${BACKEND}" run composition -f "${REAL_COMP_FILE}" | tee run.out
+/testground --endpoint "${BACKEND}" run composition \
+	-f "${REAL_COMP_FILE}"                            \
+	--metadata-repo "${GITHUB_REPOSITORY}"            \
+	--metadata-branch "${GITHUB_REF#refs/heads/}"     \
+	--metadata-commit "${GITHUB_SHA}" | tee run.out   \
 TGID=$(awk '/run is queued with ID/ {print $10}' <run.out)
 echo "${OUTPUT_ID}${TGID}"
 
@@ -41,7 +45,7 @@ echo "Waiting for job to complete."
 
 while [ "${status}" != "complete" -a "${status}" != "canceled" ]
 do
-	sleep 30
+	sleep 120
 	status=$(/testground --endpoint "${BACKEND}" status -t "${TGID}" | awk '/Status/ {print $2}')
 	echo "last polled status is ${status}"
 	echo "${OUTPUT_STATUS}${status}"
