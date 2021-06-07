@@ -33,8 +33,8 @@ ln -s "${REAL_PLAN_DIR}" "${PLANSHOME}"
 # so instead, do a long poll.
 /testground --endpoint "${BACKEND}" run composition \
   -f "${REAL_COMP_FILE}"                            \
-  --metadata-repo "${GITHUB_REPOSITORY}"            \
-  --metadata-branch "${GITHUB_REF#refs/heads/}"     \
+  --metadata-repo "${GITHUB_ACTION_REPOSITORY}"            \
+  --metadata-branch "${GITHUB_ACTION_REF#refs/heads/}"     \
   --metadata-commit "${GITHUB_SHA}" | tee run.out
 TGID=$(awk '/run is queued with ID/ {print $10}' <run.out)
 echo "${OUTPUT_ID}${TGID}"
