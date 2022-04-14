@@ -13,7 +13,7 @@ jobs:
       - run: |
           source .github/scripts/changelog.sh
           git fetch origin --tags
-          if [[ -z "$(git tag -l "v$version")" ]]; then
+          if [[ ! -z "$version" && -z "$(git tag -l "v$version")" ]]; then
             git tag "v$major.$minor.$patch"
             git tag "v$major.$minor" --force
             git tag "v$major" --force
