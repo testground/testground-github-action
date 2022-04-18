@@ -37,6 +37,14 @@ ln -s "${REAL_PLAN_DIR}" "${PLANSHOME}"
   --metadata-branch "${GITHUB_REF#refs/heads/}"     \
   --metadata-commit "${GITHUB_SHA}" | tee run.out
 TGID=$(awk '/run is queued with ID/ {print $10}' <run.out)
+
+# Make sure the we received a run ID
+if [ -z "$TGID" ]
+then
+	echo "${OUTPUT_OUTCOME}failure/not_queued"
+	exit "${FAILURE}"
+fi
+
 echo "${OUTPUT_ID}${TGID}"
 
 echo "Got testground ID ${TGID}"

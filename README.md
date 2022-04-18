@@ -1,3 +1,5 @@
+*NOTE*: This repository was forked from https://github.com/coryschwartz/testground-github-action to continue its' active development (initially to include the following fix: https://github.com/coryschwartz/testground-github-action/pull/2).
+
 # testground-github-action
 
 Submit jobs to [testground](https://testground.ai) and view the outcome in Github.
@@ -27,7 +29,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: ${{ matrix.composition_file }}
-        id: 
+        id:
         uses: coryschwartz/testground-github-action@v1.0
         with:
           backend_addr: ${{ matrix.backend_addr }}
