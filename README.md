@@ -9,7 +9,7 @@ Submit jobs to [testground](https://testground.ai) and view the outcome in Githu
 
 As a code checker for PRs:
 
-```
+```yaml
 ---
 name: Testground PR Checker
 
@@ -30,7 +30,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: ${{ matrix.composition_file }}
         id:
-        uses: coryschwartz/testground-github-action@v1.0
+        uses: testground/testground-github-action@v1.0
         with:
           backend_addr: ${{ matrix.backend_addr }}
           backend_proto: ${{ matrix.backend_proto }}
