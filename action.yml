@@ -2,14 +2,10 @@
 name: 'testground-composition'
 description: 'Run a Testground composition'
 inputs:
-  backend_addr:
+  backend_endpoint:
     description: 'api endpoint for the testground daemon'
     required: true
-    default: 'ci.testground.ipfs.team'
-  backend_proto:
-    description: 'protocol (i.e. http/https) to use when connecting to the backend'
-    required: true
-    default: 'https'
+    default: 'https://ci.testground.ipfs.team'
   plan_directory:
     description: 'testplan path relative to the root of the git directory'
     required: true
@@ -27,6 +23,6 @@ runs:
   using: 'docker'
   image: './Dockerfile'
   args:
-    - ${{ inputs.backend }}
+    - ${{ inputs.backend_endpoint }}
     - ${{ inputs.plan_directory }}
     - ${{ inputs.composition_file }}

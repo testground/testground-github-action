@@ -13,8 +13,6 @@ OUTPUT_STATUS="::set-output name=status::"
 OUTPUT_OUTCOME="::set-output name=outcome::"
 OUTPUT_ID="::set-output name=testground_id::"
 
-BACKEND="${INPUT_BACKEND_PROTO}"'://'"${INPUT_BACKEND_ADDR}"
-
 # Make sure the input files exist.
 test -d "${INPUT_PLAN_DIRECTORY}" || exit "${FALURE}"
 test -f "${INPUT_COMPOSITION_FILE}" || exit "${FAILURE}"
@@ -28,10 +26,10 @@ ln -s "${REAL_PLAN_DIR}" "${PLANSHOME}"
 
 # Run test and wait until finished.
 # There is a --wait option, so it might work to use it like this
-# testground --endpoint "$BACKEND" run composition -f "$REAL_COMP_FILE" --wait
+# testground --endpoint "$INPUT_BACKEND_ENDPOINT" run composition -f "$REAL_COMP_FILE" --wait
 # However, --wait doesn't always work well particularly for long-running jobs
 # so instead, do a long poll.
-/testground --endpoint "${BACKEND}" run composition \
+/testground --endpoint "${INPUT_BACKEND_ENDPOINT}" run composition \
   -f "${REAL_COMP_FILE}"                            \
   --metadata-repo "${GITHUB_REPOSITORY}"            \
   --metadata-branch "${GITHUB_REF#refs/heads/}"     \
@@ -54,7 +52,7 @@ echo "Waiting for job to complete."
 while [ "${status}" != "complete" -a "${status}" != "canceled" ]
 do
 	sleep 120
-	status=$(/testground --endpoint "${BACKEND}" status -t "${TGID}" | awk '/Status/ {print $2}')
+	status=$(/testground --endpoint "${INPUT_BACKEND_ENDPOINT}" status -t "${TGID}" | awk '/Status/ {print $2}')
 	echo "last polled status is ${status}"
 	echo "${OUTPUT_STATUS}${status}"
 done
@@ -62,7 +60,7 @@ done
 echo -n "Testground ended: "; date
 
 echo getting extended status
-/testground --endpoint "${BACKEND}" status -t "${TGID}" --extended  | tee extendedstatus.out
+/testground --endpoint "${INPUT_BACKEND_ENDPOINT}" status -t "${TGID}" --extended  | tee extendedstatus.out
 # Get the extened status, which includes a "Result" section.
 # Capture the line that occurs after "Result:"
 extstatus=$(awk '/Result/ {getline; print $0}' <extendedstatus.out)
