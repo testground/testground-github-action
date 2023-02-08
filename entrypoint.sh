@@ -7,12 +7,6 @@ PLANSHOME="${HOME}/testground/plans"
 SUCCESS=0
 FAILURE=1
 
-# For github to collect the action output, use these strings:
-# Note that if you echo these strings, they will not be visible in the action log.
-OUTPUT_STATUS="::set-output name=status::"
-OUTPUT_OUTCOME="::set-output name=outcome::"
-OUTPUT_ID="::set-output name=testground_id::"
-
 BACKEND="${INPUT_BACKEND_PROTO}"'://'"${INPUT_BACKEND_ADDR}"
 
 # Make sure the input files exist.
@@ -41,11 +35,11 @@ TGID=$(awk '/run is queued with ID/ {print $10}' <run.out)
 # Make sure the we received a run ID
 if [ -z "$TGID" ]
 then
-	echo "${OUTPUT_OUTCOME}failure/not_queued"
+	echo "outcome=failure/not_queued" >> $GITHUB_OUTPUT
 	exit "${FAILURE}"
 fi
 
-echo "${OUTPUT_ID}${TGID}"
+echo "testground_id=${TGID}" >> $GITHUB_OUTPUT
 
 echo "Got testground ID ${TGID}"
 echo -n "Testground started: "; date
@@ -56,7 +50,7 @@ do
 	sleep 120
 	status=$(/testground --endpoint "${BACKEND}" status -t "${TGID}" | awk '/Status/ {print $2}')
 	echo "last polled status is ${status}"
-	echo "${OUTPUT_STATUS}${status}"
+	echo "status=${status}" >> $GITHUB_OUTPUT
 done
 
 echo -n "Testground ended: "; date
@@ -75,7 +69,7 @@ extstatus=$(echo "${extstatus}" | tr -d "[:cntrl:]" |  sed 's/\[0m//g')
 # job was canceled before it began for some reason.
 if [ "${extstatus}" == "null" ]
 then
-	echo "${OUTPUT_OUTCOME}failure/canceled"
+	echo "outcome=failure/canceled" >> $GITHUB_OUTPUT
 	exit "$FAILURE"
 fi
 
@@ -86,6 +80,6 @@ outcome=$(echo "${extstatus}" | jq ".outcome")
 
 echo "the extended status was ${extstatus}"
 echo "The outcome of this test was ${outcome}"
-echo "${OUTPUT_OUTCOME}${outcome}"
+echo "outcome=${outcome}" >> $GITHUB_OUTPUT
 
 test "${outcome}" = "\"success\"" && exit "${SUCCESS}" || exit "${FAILURE}"
